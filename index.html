@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#eef9ff">
+  <title>Tekno Consulting | Portale Aziendale</title>
+  <style>
+    :root {
+      --navy: #071f33;
+      --text: #102f45;
+      --muted: #5f788a;
+      --cyan: #00aeea;
+      --blue: #006ea6;
+      --green: #0b9b76;
+      --line: rgba(0,174,234,.24);
+      --glass: rgba(255,255,255,.78);
+      --shadow: 0 22px 60px rgba(4,74,117,.12), 0 0 28px rgba(0,174,234,.08);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 8% 5%, rgba(0,174,234,.18), transparent 28%),
+        radial-gradient(circle at 90% 12%, rgba(0,83,255,.10), transparent 27%),
+        linear-gradient(135deg, #f7fcff 0%, #eaf7ff 48%, #fff 100%);
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      background-image:
+        linear-gradient(rgba(0,132,200,.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,132,200,.045) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: linear-gradient(to bottom, #000, rgba(0,0,0,.25), transparent 90%);
+    }
+    body::after {
+      content: "";
+      position: fixed;
+      width: 480px;
+      height: 480px;
+      right: -220px;
+      top: 120px;
+      z-index: -1;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,174,234,.15), transparent 67%);
+      animation: breathe 6s ease-in-out infinite alternate;
+    }
+    @keyframes breathe { to { transform: translate(-36px, 22px) scale(1.12); } }
+    @keyframes rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+
+    .shell { width: min(1240px, calc(100% - 36px)); margin: 0 auto; padding: 22px 0 38px; }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+      padding: 15px 18px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: rgba(255,255,255,.72);
+      box-shadow: 0 12px 34px rgba(4,74,117,.08);
+      backdrop-filter: blur(18px);
+      position: sticky;
+      top: 14px;
+      z-index: 50;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .brand-mark {
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      color: white;
+      font-weight: 950;
+      letter-spacing: -.06em;
+      background: linear-gradient(145deg, #00bff3, #006ba4);
+      box-shadow: 0 10px 24px rgba(0,135,190,.27), inset 0 1px 1px rgba(255,255,255,.5);
+    }
+    .brand-copy strong { display: block; color: var(--navy); font-size: 15px; letter-spacing: .01em; }
+    .brand-copy span { display: block; margin-top: 2px; color: var(--muted); font-size: 11px; letter-spacing: .13em; text-transform: uppercase; }
+    .top-actions { display: flex; align-items: center; gap: 10px; }
+    .date-pill, .profile {
+      min-height: 42px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 0 13px;
+      border-radius: 14px;
+      border: 1px solid rgba(0,174,234,.18);
+      background: rgba(241,250,255,.82);
+      color: #315469;
+      font-size: 12px;
+      font-weight: 750;
+    }
+    .profile span { width: 8px; height: 8px; border-radius: 50%; background: #11b981; box-shadow: 0 0 0 5px rgba(17,185,129,.10); }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      margin-top: 18px;
+      min-height: 370px;
+      display: grid;
+      grid-template-columns: 1.25fr .75fr;
+      align-items: center;
+      gap: 28px;
+      padding: 54px 56px;
+      border-radius: 32px;
+      border: 1px solid rgba(0,174,234,.32);
+      background: linear-gradient(135deg, rgba(255,255,255,.93), rgba(231,247,255,.91));
+      box-shadow: var(--shadow);
+      animation: rise .65s ease both;
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      right: -60px;
+      top: -100px;
+      width: 450px;
+      height: 450px;
+      border-radius: 50%;
+      border: 1px solid rgba(0,174,234,.16);
+      box-shadow: 0 0 0 58px rgba(0,174,234,.035), 0 0 0 116px rgba(0,174,234,.025);
+    }
+    .hero-copy, .hero-visual { position: relative; z-index: 2; }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(0,174,234,.25);
+      background: rgba(0,174,234,.07);
+      color: var(--blue);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .eyebrow::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 12px var(--cyan); }
+    h1 { max-width: 700px; margin: 20px 0 14px; color: var(--navy); font-size: clamp(38px, 5.2vw, 68px); line-height: .98; letter-spacing: -.06em; }
+    h1 em { color: var(--blue); font-style: normal; }
+    .hero-copy > p { max-width: 650px; margin: 0; color: var(--muted); font-size: 16px; line-height: 1.72; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 11px; margin-top: 26px; }
+    .btn {
+      min-height: 48px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      padding: 0 18px;
+      border: 0;
+      border-radius: 14px;
+      text-decoration: none;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 850;
+      cursor: pointer;
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn-primary { color: white; background: linear-gradient(135deg, #00b9ef, #006ea6); box-shadow: 0 12px 28px rgba(0,126,180,.25); }
+    .btn-light { color: #1e526e; border: 1px solid rgba(0,174,234,.22); background: rgba(255,255,255,.7); }
+    .hero-visual { display: grid; place-items: center; }
+    .visual-ring {
+      width: min(270px, 100%);
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: linear-gradient(145deg, rgba(255,255,255,.95), rgba(219,244,255,.88));
+      border: 1px solid rgba(0,174,234,.29);
+      box-shadow: 0 24px 55px rgba(0,111,162,.15), inset 0 0 34px rgba(0,174,234,.08);
+    }
+    .visual-ring svg { width: 55%; color: var(--blue); filter: drop-shadow(0 10px 15px rgba(0,110,166,.18)); }
+
+    .section-head { display: flex; justify-content: space-between; align-items: end; gap: 18px; margin: 34px 4px 17px; }
+    .section-head h2 { margin: 0 0 5px; color: var(--navy); font-size: 27px; letter-spacing: -.035em; }
+    .section-head p { margin: 0; color: var(--muted); font-size: 13px; }
+    .search { position: relative; width: min(310px, 100%); }
+    .search svg { position: absolute; left: 14px; top: 50%; width: 18px; transform: translateY(-50%); color: #6e8b9d; }
+    .search input {
+      width: 100%;
+      height: 47px;
+      padding: 0 15px 0 42px;
+      border-radius: 14px;
+      border: 1px solid rgba(0,174,234,.22);
+      outline: 0;
+      background: rgba(255,255,255,.78);
+      color: var(--text);
+      font: inherit;
+      transition: box-shadow .2s, border-color .2s;
+    }
+    .search input:focus { border-color: rgba(0,174,234,.65); box-shadow: 0 0 0 4px rgba(0,174,234,.08); }
+
+    .services { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .service {
+      position: relative;
+      min-height: 245px;
+      display: flex;
+      flex-direction: column;
+      padding: 24px;
+      overflow: hidden;
+      border: 1px solid rgba(0,174,234,.22);
+      border-radius: 23px;
+      background: var(--glass);
+      box-shadow: 0 13px 36px rgba(4,74,117,.08);
+      backdrop-filter: blur(14px);
+      transition: transform .24s ease, box-shadow .24s ease, border-color .24s ease;
+      animation: rise .65s ease both;
+    }
+    .service:nth-child(2) { animation-delay: .06s; }
+    .service:nth-child(3) { animation-delay: .12s; }
+    .service:nth-child(4) { animation-delay: .18s; }
+    .service:nth-child(5) { animation-delay: .24s; }
+    .service:nth-child(6) { animation-delay: .30s; }
+    .service:hover { transform: translateY(-6px); border-color: rgba(0,174,234,.55); box-shadow: 0 23px 50px rgba(4,74,117,.13), 0 0 25px rgba(0,174,234,.10); }
+    .service::after { content: ""; position: absolute; width: 150px; height: 150px; right: -70px; bottom: -80px; border-radius: 50%; background: radial-gradient(circle, rgba(0,174,234,.15), transparent 68%); }
+    .service-top { display: flex; justify-content: space-between; align-items: start; gap: 12px; }
+    .icon {
+      width: 50px;
+      height: 50px;
+      display: grid;
+      place-items: center;
+      border-radius: 15px;
+      color: var(--blue);
+      background: linear-gradient(145deg, #fff, #e3f6ff);
+      border: 1px solid rgba(0,174,234,.22);
+      box-shadow: 0 10px 22px rgba(0,111,162,.10);
+    }
+    .icon svg { width: 25px; }
+    .tag { padding: 7px 9px; border-radius: 999px; color: #08775e; background: rgba(11,155,118,.09); border: 1px solid rgba(11,155,118,.18); font-size: 10px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+    .tag.soon { color: #6d7b86; background: rgba(89,112,127,.07); border-color: rgba(89,112,127,.13); }
+    .service h3 { margin: 20px 0 8px; color: var(--navy); font-size: 19px; letter-spacing: -.025em; }
+    .service p { flex: 1; margin: 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
+    .service-link { position: relative; z-index: 2; display: inline-flex; align-items: center; gap: 8px; margin-top: 21px; color: var(--blue); border: 0; background: none; padding: 0; font: inherit; font-size: 12px; font-weight: 900; text-decoration: none; cursor: pointer; }
+    .service-link svg { width: 16px; transition: transform .2s; }
+    .service:hover .service-link svg { transform: translateX(4px); }
+    .no-results { display: none; grid-column: 1 / -1; padding: 35px; text-align: center; color: var(--muted); border: 1px dashed var(--line); border-radius: 20px; }
+
+    footer { display: flex; justify-content: space-between; gap: 16px; margin-top: 30px; padding: 18px 5px 0; border-top: 1px solid rgba(0,174,234,.14); color: #708796; font-size: 11px; }
+    .toast { position: fixed; right: 20px; bottom: 20px; max-width: 350px; padding: 15px 17px; border-radius: 15px; color: white; background: #0b3148; box-shadow: 0 18px 45px rgba(0,25,42,.24); font-size: 13px; font-weight: 700; opacity: 0; transform: translateY(20px); pointer-events: none; transition: .25s; z-index: 100; }
+    .toast.show { opacity: 1; transform: none; }
+
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; padding: 42px 34px; }
+      .hero-visual { display: none; }
+      .services { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 620px) {
+      .shell { width: min(100% - 22px, 1240px); padding-top: 11px; }
+      .topbar { top: 8px; padding: 12px; border-radius: 17px; }
+      .brand-copy span, .date-pill { display: none; }
+      .profile { padding: 0 10px; font-size: 0; }
+      .hero { min-height: 0; padding: 34px 23px; border-radius: 25px; }
+      h1 { font-size: 41px; }
+      .hero-copy > p { font-size: 14px; }
+      .hero-actions .btn { width: 100%; }
+      .section-head { align-items: stretch; flex-direction: column; }
+      .search { width: 100%; }
+      .services { grid-template-columns: 1fr; }
+      footer { flex-direction: column; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand" aria-label="Tekno Consulting">
+        <div class="brand-mark">TK</div>
+        <div class="brand-copy"><strong>Tekno Consulting</strong><span>Portale aziendale</span></div>
+      </div>
+      <div class="top-actions">
+        <div class="date-pill" id="currentDate">—</div>
+        <div class="profile"><span></span> Area operativa</div>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow">Workspace digitale</div>
+          <h1>Tutto il lavoro.<br><em>Un unico portale.</em></h1>
+          <p>Accedi in modo semplice agli strumenti aziendali, controlla le attività operative e mantieni sempre aggiornate le informazioni importanti.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#servizi">Apri i servizi <span aria-hidden="true">↓</span></a>
+            <button class="btn btn-light" type="button" data-soon>Consulta le comunicazioni</button>
+          </div>
+        </div>
+        <div class="hero-visual" aria-hidden="true">
+          <div class="visual-ring">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.35"><path d="M4 19.5V9.7L12 4l8 5.7v9.8"/><path d="M8 20v-6h8v6M3 20h18"/><path d="M8 10h.01M12 10h.01M16 10h.01" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+      </section>
+
+      <section id="servizi">
+        <div class="section-head">
+          <div><h2>Servizi aziendali</h2><p>Seleziona l’area di lavoro che vuoi utilizzare.</p></div>
+          <label class="search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <input id="serviceSearch" type="search" placeholder="Cerca un servizio…" aria-label="Cerca un servizio">
+          </label>
+        </div>
+
+        <div class="services" id="serviceGrid">
+          <article class="service" data-search="gestione mezzi aziendali flotta veicoli targhe revisioni assegnazioni report">
+            <div class="service-top"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 14.5 5.1 9h13.8l2.1 5.5V19h-2v-2H5v2H3v-4.5Z"/><path d="M6 14h.01M18 14h.01M7 9l1.2-3h7.6L17 9" stroke-linecap="round"/></svg></div><span class="tag">Attivo</span></div>
+            <h3>Gestione mezzi aziendali</h3>
+            <p>Anagrafica completa dei veicoli, fotografie, targhe, assegnatari, scadenze, note operative e report esportabili.</p>
+            <a class="service-link" href="gestione-mezzi.html">Apri il servizio <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14m-5-5 5 5-5 5"/></svg></a>
+          </article>
+
+          <article class="service" data-search="commesse cantieri lavori preventivi">
+            <div class="service-top"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20h16M6 20V8l6-4 6 4v12M9 11h6M9 15h6"/></svg></div><span class="tag soon">Prossimamente</span></div>
+            <h3>Gestione commesse</h3><p>Panoramica dei cantieri, stato delle attività, documenti e principali riferimenti economici.</p>
+            <button class="service-link" type="button" data-soon>Scopri il modulo <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14m-5-5 5 5-5 5"/></svg></button>
+          </article>
+
+          <article class="service" data-search="scadenze documenti certificazioni sicurezza durc">
+            <div class="service-top"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 3h10v4H7zM5 5H4v16h16V5h-1M8 12h8M8 16h5"/></svg></div><span class="tag soon">Prossimamente</span></div>
+            <h3>Scadenze e documenti</h3><p>Archivio per certificazioni, adempimenti, documenti aziendali e relative date di rinnovo.</p>
+            <button class="service-link" type="button" data-soon>Scopri il modulo <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14m-5-5 5 5-5 5"/></svg></button>
+          </article>
+
+          <article class="service" data-search="personale dipendenti squadre assegnazioni">
+            <div class="service-top"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><path d="M3.5 20v-2a5.5 5.5 0 0 1 11 0v2M16 5.5a3 3 0 0 1 0 5.8M17 14a5 5 0 0 1 3.5 4.8V20"/></svg></div><span class="tag soon">Prossimamente</span></div>
+            <h3>Personale e squadre</h3><p>Organizzazione delle risorse, composizione delle squadre e assegnazione alle attività operative.</p>
+            <button class="service-link" type="button" data-soon>Scopri il modulo <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14m-5-5 5 5-5 5"/></svg></button>
+          </article>
+
+          <article class="service" data-search="attrezzature magazzino inventario materiali">
+            <div class="service-top"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m4 8 8-4 8 4-8 4-8-4Z"/><path d="m4 12 8 4 8-4M4 16l8 4 8-4"/></svg></div><span class="tag soon">Prossimamente</span></div>
+            <h3>Attrezzature e magazzino</h3><p>Inventario di strumenti, materiali e dotazioni con disponibilità e assegnazioni sempre consultabili.</p>
+            <button class="service-link" type="button" data-soon>Scopri il modulo <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14m-5-5 5 5-5 5"/></svg></button>
+          </article>
+
+          <article class="service" data-search="report riepiloghi esportazioni analisi">
+            <div class="service-top"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 20V10M12 20V4M19 20v-7"/></svg></div><span class="tag soon">Prossimamente</span></div>
+            <h3>Report e riepiloghi</h3><p>Una vista unica sui dati aziendali, con filtri, indicatori e documenti pronti da esportare.</p>
+            <button class="service-link" type="button" data-soon>Scopri il modulo <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14m-5-5 5 5-5 5"/></svg></button>
+          </article>
+          <div class="no-results" id="noResults">Nessun servizio corrisponde alla ricerca.</div>
+        </div>
+      </section>
+    </main>
+
+    <footer><span>© <span id="year"></span> Tekno Consulting S.r.l.</span><span>Portale aziendale · Versione 1.0</span></footer>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const now = new Date();
+    document.getElementById('currentDate').textContent = new Intl.DateTimeFormat('it-IT', { weekday: 'long', day: '2-digit', month: 'long' }).format(now);
+    document.getElementById('year').textContent = now.getFullYear();
+
+    const toast = document.getElementById('toast');
+    let toastTimer;
+    function notify(message) {
+      toast.textContent = message;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 3200);
+    }
+    document.querySelectorAll('[data-soon]').forEach(button => button.addEventListener('click', () => notify('Questo servizio verrà attivato in una prossima fase.')));
+
+    const search = document.getElementById('serviceSearch');
+    const cards = [...document.querySelectorAll('.service')];
+    const noResults = document.getElementById('noResults');
+    search.addEventListener('input', () => {
+      const query = search.value.trim().toLocaleLowerCase('it');
+      let visible = 0;
+      cards.forEach(card => {
+        const matches = card.dataset.search.includes(query) || card.textContent.toLocaleLowerCase('it').includes(query);
+        card.style.display = matches ? '' : 'none';
+        if (matches) visible++;
+      });
+      noResults.style.display = visible ? 'none' : 'block';
+    });
+  </script>
+</body>
+</html>
