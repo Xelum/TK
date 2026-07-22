@@ -1,0 +1,1779 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Analitica KAM - Dashboard Commesse</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+
+  <style>
+    :root {
+      --text: #102033;
+      --text-strong: #071f33;
+      --text-soft: #426177;
+      --cyan: #006ea6;
+      --neon-blue: #00bfff;
+      --green: #047857;
+      --yellow: #a16207;
+      --orange: #f97316;
+      --red: #dc2626;
+      --purple: #7e22ce;
+      --border-neon: rgba(0, 180, 255, 0.42);
+      --radius: 24px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      width: 100%;
+      overflow-x: hidden;
+    }
+
+    body {
+      margin: 0;
+      width: 100%;
+      min-height: 100vh;
+      font-family: Inter, Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 8% 8%, rgba(0, 180, 255, 0.20), transparent 28%),
+        radial-gradient(circle at 92% 12%, rgba(0, 90, 255, 0.14), transparent 30%),
+        linear-gradient(135deg, #f4fbff 0%, #eaf6ff 45%, #ffffff 100%);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0, 140, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 140, 255, 0.05) 1px, transparent 1px);
+      background-size: 46px 46px;
+      mask-image: linear-gradient(to bottom, black, rgba(0,0,0,0.25), transparent);
+      pointer-events: none;
+      z-index: -2;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(120deg, transparent, rgba(0, 180, 255, 0.08), transparent);
+      pointer-events: none;
+      animation: backgroundMove 8s linear infinite;
+      z-index: -1;
+    }
+
+    @keyframes backgroundMove {
+      0% { transform: translateX(-30%); }
+      100% { transform: translateX(30%); }
+    }
+
+    .app {
+      width: min(1520px, calc(100% - 36px));
+      margin: 0 auto;
+      padding: 22px 0 60px;
+      animation: pageIn 0.7s ease both;
+      display: none;
+    }
+
+    @keyframes pageIn {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .top-access-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      position: relative;
+      z-index: 20;
+      flex-wrap: wrap;
+    }
+
+    .top-access-right,
+    .top-access-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .user-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 15px;
+      min-height: 46px;
+      border-radius: 15px;
+      background: rgba(255,255,255,0.82);
+      border: 1px solid rgba(0, 180, 255, 0.32);
+      color: #082033;
+      font-size: 13px;
+      font-weight: 850;
+      max-width: 360px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      box-shadow:
+        0 12px 28px rgba(0, 92, 160, 0.10),
+        0 0 18px rgba(0, 180, 255, 0.12);
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--border-neon);
+      border-radius: 34px;
+      padding: 28px 36px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(235, 248, 255, 0.96));
+      box-shadow:
+        0 18px 45px rgba(0, 92, 160, 0.14),
+        0 0 30px rgba(0, 180, 255, 0.22),
+        inset 0 0 20px rgba(0, 180, 255, 0.05);
+      margin-bottom: 16px;
+      z-index: 5;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 1px;
+      border-radius: 33px;
+      border: 1px solid rgba(0, 180, 255, 0.20);
+      pointer-events: none;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 420px;
+      height: 420px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0, 180, 255, 0.28), rgba(0, 180, 255, 0.08), transparent 68%);
+      right: -120px;
+      top: -150px;
+      filter: blur(2px);
+      animation: floatGlow 5s ease-in-out infinite alternate;
+      z-index: 0;
+    }
+
+    @keyframes floatGlow {
+      from { transform: translate(0, 0) scale(1); }
+      to { transform: translate(-22px, 26px) scale(1.08); }
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 9px 14px;
+      border-radius: 999px;
+      background: rgba(0, 180, 255, 0.10);
+      color: var(--cyan);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      border: 1px solid rgba(0, 180, 255, 0.35);
+      box-shadow: 0 0 18px rgba(0, 180, 255, 0.12);
+      margin-bottom: 18px;
+    }
+
+    .pulse-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #16a34a;
+      box-shadow: 0 0 0 rgba(22, 163, 74, 0.7);
+      animation: pulse 1.7s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.70); }
+      70% { box-shadow: 0 0 0 11px rgba(22, 163, 74, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); }
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(34px, 4.2vw, 58px);
+      letter-spacing: -0.055em;
+      line-height: 1;
+      color: var(--text-strong);
+      text-shadow:
+        0 0 14px rgba(0, 180, 255, 0.16),
+        0 1px 0 rgba(255,255,255,0.60);
+    }
+
+    .hero-description {
+      margin: 12px 0 0;
+      max-width: 820px;
+      color: var(--text-soft);
+      font-size: 15px;
+      line-height: 1.55;
+      font-weight: 650;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      font-family: inherit;
+      transition: 0.22s ease;
+      font-weight: 900;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      padding: 13px 18px;
+      border-radius: 15px;
+      font-size: 14px;
+      min-height: 48px;
+      white-space: nowrap;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      color: #03111f;
+      background: linear-gradient(135deg, #a8f3ff, #38d9ff 45%, #00a6ff);
+      box-shadow:
+        0 12px 28px rgba(56,217,255,0.32),
+        0 0 24px rgba(56,217,255,0.28);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        0 18px 38px rgba(56,217,255,0.45),
+        0 0 34px rgba(56,217,255,0.36);
+    }
+
+    .btn-glass {
+      color: #082033;
+      background: rgba(255,255,255,0.72);
+      border: 1px solid rgba(0, 180, 255, 0.38);
+      box-shadow: 0 0 18px rgba(0, 180, 255, 0.12);
+      backdrop-filter: blur(18px);
+    }
+
+    .btn-danger {
+      color: white;
+      background: linear-gradient(135deg, #ef4444, #b91c1c);
+      box-shadow: 0 12px 28px rgba(239, 68, 68, 0.22);
+    }
+
+    .btn-small {
+      min-height: 42px;
+      padding: 11px 15px;
+      font-size: 13px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 18px;
+      margin-bottom: 22px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .stat-card {
+      position: relative;
+      overflow: hidden;
+      min-height: 150px;
+      border: 1px solid var(--border-neon);
+      border-radius: var(--radius);
+      padding: 22px;
+      background: linear-gradient(145deg, rgba(255,255,255,0.94), rgba(232,247,255,0.96));
+      box-shadow:
+        0 14px 32px rgba(0, 92, 160, 0.12),
+        0 0 24px rgba(0, 180, 255, 0.18),
+        inset 0 0 16px rgba(0, 180, 255, 0.04);
+      backdrop-filter: blur(18px);
+      animation: cardUp 0.55s ease both;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    }
+
+    @keyframes cardUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .stat-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(0, 180, 255, 0.14), transparent 58%);
+      opacity: 0;
+      transition: 0.25s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(0, 180, 255, 0.85);
+      box-shadow:
+        0 18px 40px rgba(0, 92, 160, 0.18),
+        0 0 34px rgba(0, 180, 255, 0.30),
+        inset 0 0 20px rgba(0, 180, 255, 0.06);
+    }
+
+    .stat-card:hover::before { opacity: 1; }
+
+    .stat-label {
+      position: relative;
+      color: #0077b6;
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+    }
+
+    .stat-value {
+      position: relative;
+      margin-top: 12px;
+      font-size: clamp(30px, 3.2vw, 46px);
+      font-weight: 950;
+      letter-spacing: -0.055em;
+      color: var(--text-strong);
+      text-shadow: 0 0 12px rgba(0, 180, 255, 0.16);
+      line-height: 1;
+    }
+
+    .stat-note {
+      position: relative;
+      margin-top: 10px;
+      color: #526b7f;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .stat-green .stat-value { color: #047857; }
+    .stat-yellow .stat-value { color: #a16207; }
+    .stat-red .stat-value { color: #b91c1c; }
+    .stat-purple .stat-value { color: #7e22ce; }
+    .stat-blue .stat-value { color: #0369a1; }
+
+    .panel {
+      border: 1px solid var(--border-neon);
+      border-radius: 28px;
+      background: linear-gradient(145deg, rgba(255,255,255,0.94), rgba(235,248,255,0.96));
+      box-shadow:
+        0 18px 42px rgba(0, 92, 160, 0.13),
+        0 0 26px rgba(0, 180, 255, 0.18),
+        inset 0 0 20px rgba(0, 180, 255, 0.04);
+      backdrop-filter: blur(18px);
+      overflow: hidden;
+      margin-bottom: 22px;
+      position: relative;
+      z-index: 1;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    }
+
+    .panel:hover {
+      transform: translateY(-3px);
+      border-color: rgba(0, 180, 255, 0.72);
+      box-shadow:
+        0 24px 54px rgba(0, 92, 160, 0.17),
+        0 0 34px rgba(0, 180, 255, 0.28),
+        inset 0 0 22px rgba(0, 180, 255, 0.06);
+    }
+
+    .panel-header {
+      padding: 23px;
+      border-bottom: 1px solid rgba(0, 180, 255, 0.22);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      background: rgba(220, 244, 255, 0.58);
+    }
+
+    .panel-title h2 {
+      margin: 0;
+      font-size: 23px;
+      letter-spacing: -0.035em;
+      color: var(--text-strong);
+    }
+
+    .panel-title p {
+      margin: 7px 0 0;
+      color: var(--text-soft);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .panel-body {
+      padding: 22px;
+    }
+
+    .filters {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+
+    .field {
+      position: relative;
+      min-width: 230px;
+      flex: 1;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--cyan);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    input,
+    select {
+      width: 100%;
+      background: rgba(255,255,255,0.92);
+      color: var(--text);
+      border: 1px solid rgba(0, 160, 230, 0.34);
+      border-radius: 15px;
+      padding: 13px 14px;
+      outline: none;
+      font-size: 14px;
+      font-family: inherit;
+      transition: 0.2s ease;
+      box-shadow:
+        inset 0 0 12px rgba(0, 120, 200, 0.04),
+        0 0 12px rgba(0, 180, 255, 0.05);
+    }
+
+    input:focus,
+    select:focus {
+      border-color: rgba(0, 180, 255, 0.90);
+      box-shadow:
+        0 0 0 4px rgba(0, 180, 255, 0.12),
+        0 0 22px rgba(0, 180, 255, 0.18);
+    }
+
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .chart-card {
+      min-height: 360px;
+      padding: 20px;
+      border-radius: 24px;
+      border: 1px solid rgba(0, 180, 255, 0.28);
+      background: rgba(255,255,255,0.74);
+      box-shadow:
+        0 10px 26px rgba(0, 92, 160, 0.09),
+        inset 0 0 14px rgba(0, 180, 255, 0.04);
+    }
+
+    .chart-card h3 {
+      margin: 0 0 8px;
+      color: var(--text-strong);
+      font-size: 18px;
+      letter-spacing: -0.03em;
+    }
+
+    .chart-card p {
+      margin: 0 0 16px;
+      color: var(--text-soft);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .chart-box {
+      position: relative;
+      height: 260px;
+      width: 100%;
+    }
+
+    .wide-chart .chart-box { height: 300px; }
+
+    .leaderboard-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .podium {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .podium-card {
+      min-height: 155px;
+      padding: 18px;
+      border-radius: 23px;
+      background: linear-gradient(145deg, rgba(255,255,255,0.95), rgba(232,247,255,0.92));
+      border: 1px solid rgba(0, 180, 255, 0.34);
+      text-align: center;
+      box-shadow: 0 12px 26px rgba(0, 92, 160, 0.10);
+    }
+
+    .podium-rank {
+      width: 46px;
+      height: 46px;
+      margin: 0 auto 12px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: 950;
+      color: #03111f;
+      background: linear-gradient(135deg, #a8f3ff, #38d9ff 45%, #00a6ff);
+      box-shadow: 0 10px 22px rgba(56,217,255,0.25);
+    }
+
+    .podium-name {
+      font-weight: 950;
+      font-size: 18px;
+      color: var(--text-strong);
+      word-break: break-word;
+    }
+
+    .podium-value {
+      margin-top: 8px;
+      color: var(--green);
+      font-weight: 950;
+    }
+
+    .podium-note {
+      margin-top: 6px;
+      color: var(--text-soft);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      max-height: 640px;
+    }
+
+    table {
+      width: 100%;
+      min-width: 980px;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: rgba(220, 244, 255, 0.98);
+      color: var(--cyan);
+      text-align: left;
+      padding: 15px 14px;
+      border-bottom: 1px solid rgba(0, 180, 255, 0.28);
+      white-space: nowrap;
+      text-transform: uppercase;
+      letter-spacing: 0.055em;
+      font-size: 11px;
+    }
+
+    tbody td {
+      padding: 15px 14px;
+      border-bottom: 1px solid rgba(0, 120, 180, 0.10);
+      color: #132f45;
+      vertical-align: top;
+      line-height: 1.45;
+    }
+
+    tbody tr {
+      transition: 0.18s ease;
+      background: rgba(255,255,255,0.62);
+    }
+
+    tbody tr:hover { background: rgba(0, 180, 255, 0.08); }
+
+    .money {
+      font-weight: 950;
+      color: var(--green);
+      white-space: nowrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 900;
+      white-space: nowrap;
+      border: 1px solid transparent;
+    }
+
+    .badge::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 8px currentColor;
+    }
+
+    .badge-da-lavorare { color: #334155; background: rgba(226,232,240,0.75); border-color: rgba(100,116,139,0.20); }
+    .badge-attesa { color: #92400e; background: rgba(254,243,199,0.95); border-color: rgba(245,158,11,0.30); }
+    .badge-aggiudicata { color: #047857; background: rgba(209,250,229,0.95); border-color: rgba(16,185,129,0.28); }
+    .badge-persa { color: #b91c1c; background: rgba(254,226,226,0.95); border-color: rgba(239,68,68,0.28); }
+    .badge-rifiutata { color: #7e22ce; background: rgba(243,232,255,0.95); border-color: rgba(168,85,247,0.28); }
+
+    .progress-wrap {
+      min-width: 150px;
+    }
+
+    .progress-line {
+      width: 100%;
+      height: 9px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(0, 180, 255, 0.12);
+      border: 1px solid rgba(0, 180, 255, 0.18);
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #38d9ff, #047857);
+      width: 0%;
+    }
+
+    .progress-label {
+      margin-top: 6px;
+      font-weight: 900;
+      color: var(--text-strong);
+      font-size: 12px;
+    }
+
+    .empty-state {
+      padding: 42px 22px;
+      text-align: center;
+      color: var(--text-soft);
+      background: rgba(235,248,255,0.70);
+      border-radius: 20px;
+    }
+
+    .empty-state strong {
+      color: var(--text-strong);
+      display: block;
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .login-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 99999999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 22px;
+      background:
+        radial-gradient(circle at top left, rgba(0, 180, 255, 0.22), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(0, 110, 166, 0.16), transparent 34%),
+        linear-gradient(135deg, #f4fbff 0%, #eaf6ff 55%, #ffffff 100%);
+    }
+
+    .login-card {
+      width: min(430px, 100%);
+      padding: 34px;
+      border-radius: 30px;
+      background: linear-gradient(145deg, rgba(255,255,255,0.96), rgba(235,248,255,0.98));
+      border: 1px solid rgba(0, 180, 255, 0.45);
+      box-shadow:
+        0 24px 60px rgba(0, 92, 160, 0.18),
+        0 0 34px rgba(0, 180, 255, 0.22);
+      text-align: center;
+      animation: modalIn 0.35s ease both;
+    }
+
+    @keyframes modalIn {
+      from { opacity: 0; transform: translateY(18px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .login-badge {
+      display: inline-flex;
+      padding: 8px 13px;
+      border-radius: 999px;
+      background: rgba(0, 180, 255, 0.10);
+      color: #006ea6;
+      border: 1px solid rgba(0, 180, 255, 0.35);
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 18px;
+    }
+
+    .login-card h2 {
+      margin: 0;
+      font-size: 32px;
+      letter-spacing: -0.045em;
+      color: #071f33;
+    }
+
+    .login-card p {
+      margin: 12px 0 22px;
+      color: #426177;
+      line-height: 1.5;
+    }
+
+    .login-field { margin-bottom: 14px; }
+    .login-button { width: 100%; }
+
+    .login-error {
+      display: none;
+      margin-top: 14px;
+      color: #b91c1c;
+      background: rgba(254,226,226,0.95);
+      border: 1px solid rgba(239,68,68,0.28);
+      padding: 10px;
+      border-radius: 14px;
+      font-weight: 800;
+      font-size: 13px;
+    }
+
+    .toast {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      padding: 15px 18px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.98);
+      color: var(--text);
+      border: 1px solid rgba(0, 180, 255, 0.42);
+      box-shadow:
+        0 18px 40px rgba(0, 70, 120, 0.18),
+        0 0 24px rgba(0, 180, 255, 0.18);
+      opacity: 0;
+      transform: translateY(20px);
+      pointer-events: none;
+      transition: 0.25s ease;
+      z-index: 2000000;
+      font-weight: 850;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 1200px) {
+      .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .charts-grid { grid-template-columns: 1fr; }
+      .leaderboard-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 760px) {
+      body {
+        background:
+          radial-gradient(circle at 12% 5%, rgba(0, 180, 255, 0.14), transparent 30%),
+          linear-gradient(135deg, #f7fcff 0%, #edf8ff 50%, #ffffff 100%);
+      }
+
+      body::after { display: none; }
+
+      .app {
+        width: 100%;
+        padding: 10px 10px 42px;
+        overflow-x: hidden;
+      }
+
+      .top-access-bar,
+      .top-access-left,
+      .top-access-right {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+      }
+
+      .user-pill,
+      .top-access-bar .btn {
+        width: 100%;
+        max-width: none;
+      }
+
+      .hero {
+        padding: 20px;
+        border-radius: 24px;
+        margin-bottom: 14px;
+      }
+
+      .hero::after { display: none; }
+
+      h1 {
+        font-size: clamp(31px, 9vw, 38px);
+        line-height: 1;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .stat-card {
+        min-height: 120px;
+        padding: 18px;
+        border-radius: 20px;
+      }
+
+      .panel { border-radius: 22px; }
+      .panel-header { padding: 18px; }
+      .panel-body { padding: 16px; }
+      .field { min-width: 100%; }
+      .podium { grid-template-columns: 1fr; }
+      .chart-card { min-height: 330px; }
+      .chart-box { height: 235px; }
+      table { min-width: 920px; }
+      .login-card { padding: 26px; border-radius: 24px; }
+      .login-card h2 { font-size: 28px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="login-screen" id="loginScreen">
+    <div class="login-card">
+      <div class="login-badge">Accesso riservato</div>
+      <h2>Analitica KAM</h2>
+      <p>Accedi con le credenziali della dashboard per visualizzare statistiche, classifiche e dettagli per ogni KAM.</p>
+
+      <div class="login-field">
+        <input type="email" id="loginEmail" placeholder="Email" autocomplete="email" />
+      </div>
+
+      <div class="login-field">
+        <input type="password" id="loginPassword" placeholder="Password" autocomplete="current-password" />
+      </div>
+
+      <button class="btn btn-primary login-button" id="loginBtn">Accedi</button>
+      <a class="btn btn-glass login-button" href="gestione-commesse.html" style="margin-top:10px;">Torna alla dashboard</a>
+
+      <div class="login-error" id="loginError">Email o password non corrette.</div>
+    </div>
+  </div>
+
+  <div class="app" id="appContent">
+    <div class="top-access-bar">
+      <div class="top-access-left">
+        <a class="btn btn-glass btn-small" href="gestione-commesse.html">← Torna alla dashboard</a>
+      </div>
+      <div class="top-access-right">
+        <span class="user-pill" id="userEmail">Utente collegato</span>
+        <button class="btn btn-danger btn-small" id="logoutBtn">Esci</button>
+      </div>
+    </div>
+
+    <section class="hero">
+      <div class="hero-content">
+        <div>
+          <div class="eyebrow">
+            <span class="pulse-dot"></span>
+            Performance e competizione commerciale
+          </div>
+          <h1>Dettaglio KAM</h1>
+          <p class="hero-description">
+            Visione generale, classifiche e schede dettagliate per confrontare lavori portati, valore generato, stato delle commesse e tasso di aggiudicazione.
+          </p>
+        </div>
+        <button class="btn btn-primary" id="refreshBtn">Aggiorna dati</button>
+      </div>
+    </section>
+
+    <section class="stats-grid">
+      <div class="stat-card stat-blue">
+        <div class="stat-label">Valore totale lavori</div>
+        <div class="stat-value" id="globalTotalAmount">0,00 €</div>
+        <div class="stat-note">Somma complessiva degli importi O.E. caricati.</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Totale lavori</div>
+        <div class="stat-value" id="globalTotalJobs">0</div>
+        <div class="stat-note">Numero totale di commesse presenti.</div>
+      </div>
+      <div class="stat-card stat-green">
+        <div class="stat-label">Miglior KAM per valore</div>
+        <div class="stat-value" id="bestKamValue">-</div>
+        <div class="stat-note" id="bestKamValueNote">In attesa di dati.</div>
+      </div>
+      <div class="stat-card stat-yellow">
+        <div class="stat-label">Tasso aggiudicazione medio</div>
+        <div class="stat-value" id="globalWinRate">0,00%</div>
+        <div class="stat-note">Aggiudicate sul totale delle commesse.</div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <div class="panel-title">
+          <h2>Visione d'insieme</h2>
+          <p>Prima di selezionare un KAM, qui vedi subito chi porta più lavori, più valore e come sono distribuiti gli stati.</p>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="charts-grid">
+          <div class="chart-card">
+            <h3>Distribuzione lavori per KAM</h3>
+            <p>Quota numerica delle commesse portate da ogni KAM.</p>
+            <div class="chart-box"><canvas id="jobsShareChart"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <h3>Distribuzione valore per KAM</h3>
+            <p>Quota economica degli importi O.E. per ogni KAM.</p>
+            <div class="chart-box"><canvas id="valueShareChart"></canvas></div>
+          </div>
+          <div class="chart-card wide-chart">
+            <h3>Valore totale per KAM</h3>
+            <p>Classifica economica dei KAM in base al valore complessivo portato.</p>
+            <div class="chart-box"><canvas id="amountByKamChart"></canvas></div>
+          </div>
+          <div class="chart-card wide-chart">
+            <h3>Stato complessivo delle commesse</h3>
+            <p>Situazione generale tra lavori aperti, in attesa, aggiudicati e non aggiudicati.</p>
+            <div class="chart-box"><canvas id="globalStatusChart"></canvas></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <div class="panel-title">
+          <h2>Classifiche KAM</h2>
+          <p>Una sezione pensata per creare una sana competizione: valore, numero lavori, conversione e indice performance.</p>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="leaderboard-grid">
+          <div>
+            <div class="podium" id="podium"></div>
+          </div>
+          <div class="chart-card" style="min-height: 260px;">
+            <h3>Indice competizione</h3>
+            <p>Punteggio sintetico calcolato da quota valore, quota lavori e tasso di aggiudicazione.</p>
+            <div class="chart-box" style="height: 190px;"><canvas id="competitionChart"></canvas></div>
+          </div>
+        </div>
+
+        <div class="table-wrap" style="margin-top:18px;">
+          <table>
+            <thead>
+              <tr>
+                <th>Pos.</th>
+                <th>KAM</th>
+                <th>Lavori</th>
+                <th>In lavorazione</th>
+                <th>Aggiudicati</th>
+                <th>Non aggiudicati</th>
+                <th>Importo totale</th>
+                <th>Valore medio</th>
+                <th>% lavori</th>
+                <th>% valore</th>
+                <th>Tasso aggiud.</th>
+                <th>Indice</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboardTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <div class="panel-title">
+          <h2>Analisi singolo KAM</h2>
+          <p>Seleziona un KAM per vedere tutti i suoi dati, la percentuale rispetto agli altri e l'elenco delle commesse portate.</p>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="filters">
+          <div class="field">
+            <label>Seleziona KAM</label>
+            <select id="kamSelect">
+              <option value="">Caricamento KAM...</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Cerca nelle commesse del KAM</label>
+            <input type="text" id="kamSearchInput" placeholder="Cerca per nome, città, note, stato..." />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="stats-grid" id="selectedStatsGrid">
+      <div class="stat-card stat-blue">
+        <div class="stat-label">Lavori portati</div>
+        <div class="stat-value" id="selectedTotalJobs">0</div>
+        <div class="stat-note" id="selectedJobsShare">0,00% rispetto al totale lavori.</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">In lavorazione</div>
+        <div class="stat-value" id="selectedWorkingJobs">0</div>
+        <div class="stat-note">Commesse da lavorare o in lavorazione.</div>
+      </div>
+      <div class="stat-card stat-green">
+        <div class="stat-label">Aggiudicati</div>
+        <div class="stat-value" id="selectedWonJobs">0</div>
+        <div class="stat-note" id="selectedWinRate">Tasso aggiudicazione 0,00%.</div>
+      </div>
+      <div class="stat-card stat-red">
+        <div class="stat-label">Non aggiudicati</div>
+        <div class="stat-value" id="selectedNotWonJobs">0</div>
+        <div class="stat-note">Somma di perse e rifiutate.</div>
+      </div>
+      <div class="stat-card stat-blue">
+        <div class="stat-label">Importo totale</div>
+        <div class="stat-value" id="selectedTotalAmount">0,00 €</div>
+        <div class="stat-note" id="selectedValueShare">0,00% rispetto al valore complessivo.</div>
+      </div>
+      <div class="stat-card stat-purple">
+        <div class="stat-label">Importo medio</div>
+        <div class="stat-value" id="selectedAverageAmount">0,00 €</div>
+        <div class="stat-note">Media degli importi di tutti i lavori portati.</div>
+      </div>
+      <div class="stat-card stat-yellow">
+        <div class="stat-label">Valore aggiudicato</div>
+        <div class="stat-value" id="selectedWonAmount">0,00 €</div>
+        <div class="stat-note">Valore economico delle commesse vinte.</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Indice competizione</div>
+        <div class="stat-value" id="selectedScore">0</div>
+        <div class="stat-note">Punteggio da 0 a 100 tra volume, valore e conversione.</div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <div class="panel-title">
+          <h2 id="selectedKamTitle">Dettaglio KAM</h2>
+          <p id="selectedKamSubtitle">Seleziona un KAM per visualizzare la sua scheda completa.</p>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="charts-grid">
+          <div class="chart-card">
+            <h3>Stati lavori del KAM</h3>
+            <p>Distribuzione tra lavori aperti, in attesa, vinti e non aggiudicati.</p>
+            <div class="chart-box"><canvas id="selectedStatusChart"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <h3>Confronto con gli altri</h3>
+            <p>Quota lavori, quota valore, tasso di aggiudicazione e indice competizione.</p>
+            <div class="chart-box"><canvas id="selectedComparisonChart"></canvas></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <div class="panel-title">
+          <h2>Commesse del KAM selezionato</h2>
+          <p>Elenco operativo di tutti i lavori collegati al KAM scelto.</p>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>N.</th>
+              <th>Nome</th>
+              <th>Cognome</th>
+              <th>Città</th>
+              <th>Indirizzo</th>
+              <th>O.E.</th>
+              <th>Ricezione doc.</th>
+              <th>Scadenza</th>
+              <th>Assemblea</th>
+              <th>Stato</th>
+              <th>Info</th>
+              <th>Annotazioni</th>
+            </tr>
+          </thead>
+          <tbody id="selectedJobsTable"></tbody>
+        </table>
+        <div class="empty-state" id="selectedEmptyState" style="display:none;">
+          <strong>Nessuna commessa trovata</strong>
+          Seleziona un altro KAM oppure modifica la ricerca.
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+
+    import {
+      getAuth,
+      signInWithEmailAndPassword,
+      signOut,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
+    import {
+      getFirestore,
+      collection,
+      onSnapshot,
+      query,
+      orderBy
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBXcvjzPv_7cmcjc4O2xpFsrGG1ydcR4js",
+      authDomain: "banca-dati-2bd62.firebaseapp.com",
+      projectId: "banca-dati-2bd62",
+      storageBucket: "banca-dati-2bd62.firebasestorage.app",
+      messagingSenderId: "898295257324",
+      appId: "1:898295257324:web:8b7f3678bf3c4f83d72dc9"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const loginScreen = document.getElementById("loginScreen");
+    const appContent = document.getElementById("appContent");
+    const loginEmail = document.getElementById("loginEmail");
+    const loginPassword = document.getElementById("loginPassword");
+    const loginError = document.getElementById("loginError");
+    const loginBtn = document.getElementById("loginBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const userEmail = document.getElementById("userEmail");
+    const refreshBtn = document.getElementById("refreshBtn");
+    const kamSelect = document.getElementById("kamSelect");
+    const kamSearchInput = document.getElementById("kamSearchInput");
+
+    let commesse = [];
+    let kamStats = [];
+    let unsubscribeCommesse = null;
+    let charts = {};
+
+    const palette = [
+      "#006ea6", "#00bfff", "#047857", "#a16207", "#dc2626", "#7e22ce",
+      "#0f766e", "#2563eb", "#ea580c", "#16a34a", "#9333ea", "#0891b2"
+    ];
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.innerText = message;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 2300);
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function formatCurrency(value) {
+      const number = Number(value) || 0;
+      const negative = number < 0 ? "-" : "";
+      const absoluteNumber = Math.abs(number);
+      const parts = absoluteNumber.toFixed(2).split(".");
+      const integerWithDots = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+      return `${negative}${integerWithDots},${parts[1]} €`;
+    }
+
+    function formatNumber(value, decimals = 2) {
+      const number = Number(value) || 0;
+      const negative = number < 0 ? "-" : "";
+      const absoluteNumber = Math.abs(number);
+      const parts = absoluteNumber.toFixed(decimals).split(".");
+      const integerWithDots = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+      return `${negative}${integerWithDots}${decimals > 0 ? "," + parts[1] : ""}`;
+    }
+
+    function formatPercent(value) {
+      return `${formatNumber(value, 2)}%`;
+    }
+
+    function formatDate(date) {
+      if (!date) return "-";
+      const parts = String(date).split("-");
+      if (parts.length !== 3) return "-";
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+
+    function getStatusLabel(stato) {
+      const labels = {
+        "da-lavorare": "Da lavorare",
+        "attesa": "In attesa",
+        "aggiudicata": "Aggiudicata",
+        "persa": "Persa",
+        "rifiutata": "Rifiutata"
+      };
+      return labels[stato] || "Da lavorare";
+    }
+
+    function getKamName(value) {
+      const name = String(value || "").trim();
+      return name || "Non indicato";
+    }
+
+    function getGlobalTotals() {
+      const totalJobs = commesse.length;
+      const totalAmount = commesse.reduce((sum, c) => sum + (Number(c.oe) || 0), 0);
+      const wonJobs = commesse.filter(c => c.stato === "aggiudicata").length;
+      const winRate = totalJobs > 0 ? (wonJobs / totalJobs) * 100 : 0;
+
+      return { totalJobs, totalAmount, wonJobs, winRate };
+    }
+
+    function calculateKamStats() {
+      const { totalJobs, totalAmount } = getGlobalTotals();
+      const grouped = {};
+
+      commesse.forEach(c => {
+        const kam = getKamName(c.kam);
+
+        if (!grouped[kam]) {
+          grouped[kam] = {
+            kam,
+            lavori: [],
+            totalJobs: 0,
+            workingJobs: 0,
+            waitingJobs: 0,
+            wonJobs: 0,
+            lostJobs: 0,
+            refusedJobs: 0,
+            notWonJobs: 0,
+            totalAmount: 0,
+            wonAmount: 0,
+            openAmount: 0,
+            notWonAmount: 0,
+            averageAmount: 0,
+            jobsShare: 0,
+            valueShare: 0,
+            winRate: 0,
+            score: 0
+          };
+        }
+
+        const item = grouped[kam];
+        const amount = Number(c.oe) || 0;
+        item.lavori.push(c);
+        item.totalJobs += 1;
+        item.totalAmount += amount;
+
+        if (c.stato === "da-lavorare") {
+          item.workingJobs += 1;
+          item.openAmount += amount;
+        } else if (c.stato === "attesa") {
+          item.waitingJobs += 1;
+          item.openAmount += amount;
+        } else if (c.stato === "aggiudicata") {
+          item.wonJobs += 1;
+          item.wonAmount += amount;
+        } else if (c.stato === "persa") {
+          item.lostJobs += 1;
+          item.notWonJobs += 1;
+          item.notWonAmount += amount;
+        } else if (c.stato === "rifiutata") {
+          item.refusedJobs += 1;
+          item.notWonJobs += 1;
+          item.notWonAmount += amount;
+        }
+      });
+
+      return Object.values(grouped)
+        .map(item => {
+          item.averageAmount = item.totalJobs > 0 ? item.totalAmount / item.totalJobs : 0;
+          item.jobsShare = totalJobs > 0 ? (item.totalJobs / totalJobs) * 100 : 0;
+          item.valueShare = totalAmount > 0 ? (item.totalAmount / totalAmount) * 100 : 0;
+          item.winRate = item.totalJobs > 0 ? (item.wonJobs / item.totalJobs) * 100 : 0;
+          item.score = Math.round((item.valueShare * 0.45) + (item.jobsShare * 0.35) + (item.winRate * 0.20));
+          item.lavori.sort((a, b) => (Number(a.numero) || 0) - (Number(b.numero) || 0));
+          return item;
+        })
+        .sort((a, b) => b.totalAmount - a.totalAmount || b.totalJobs - a.totalJobs || a.kam.localeCompare(b.kam));
+    }
+
+    function createOrUpdateChart(key, canvasId, config) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas || !window.Chart) return;
+
+      if (charts[key]) {
+        charts[key].destroy();
+      }
+
+      charts[key] = new Chart(canvas, config);
+    }
+
+    function baseChartOptions(extra = {}) {
+      return {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: "bottom",
+            labels: {
+              boxWidth: 14,
+              boxHeight: 14,
+              color: "#102033",
+              font: { weight: "700" }
+            }
+          },
+          tooltip: {
+            backgroundColor: "rgba(7,31,51,0.94)",
+            padding: 12,
+            titleFont: { weight: "900" },
+            bodyFont: { weight: "700" }
+          }
+        },
+        ...extra
+      };
+    }
+
+    function updateGlobalCards() {
+      const { totalJobs, totalAmount, winRate } = getGlobalTotals();
+      const bestValue = kamStats[0] || null;
+
+      document.getElementById("globalTotalAmount").innerText = formatCurrency(totalAmount);
+      document.getElementById("globalTotalJobs").innerText = totalJobs;
+      document.getElementById("globalWinRate").innerText = formatPercent(winRate);
+
+      if (bestValue) {
+        document.getElementById("bestKamValue").innerText = bestValue.kam;
+        document.getElementById("bestKamValueNote").innerText = `${formatCurrency(bestValue.totalAmount)} portati, pari al ${formatPercent(bestValue.valueShare)} del valore totale.`;
+      } else {
+        document.getElementById("bestKamValue").innerText = "-";
+        document.getElementById("bestKamValueNote").innerText = "In attesa di dati.";
+      }
+    }
+
+    function renderOverviewCharts() {
+      const labels = kamStats.map(k => k.kam);
+      const jobsData = kamStats.map(k => k.totalJobs);
+      const valueData = kamStats.map(k => k.totalAmount);
+      const colors = labels.map((_, index) => palette[index % palette.length]);
+
+      const statusLabels = ["Da lavorare", "In attesa", "Aggiudicate", "Perse", "Rifiutate"];
+      const statusData = [
+        commesse.filter(c => c.stato === "da-lavorare").length,
+        commesse.filter(c => c.stato === "attesa").length,
+        commesse.filter(c => c.stato === "aggiudicata").length,
+        commesse.filter(c => c.stato === "persa").length,
+        commesse.filter(c => c.stato === "rifiutata").length
+      ];
+      const statusColors = ["#64748b", "#f59e0b", "#047857", "#dc2626", "#7e22ce"];
+
+      createOrUpdateChart("jobsShare", "jobsShareChart", {
+        type: "doughnut",
+        data: { labels, datasets: [{ data: jobsData, backgroundColor: colors, borderWidth: 0 }] },
+        options: baseChartOptions({
+          cutout: "62%",
+          plugins: {
+            ...baseChartOptions().plugins,
+            tooltip: {
+              callbacks: {
+                label: context => `${context.label}: ${context.raw} lavori`
+              }
+            }
+          }
+        })
+      });
+
+      createOrUpdateChart("valueShare", "valueShareChart", {
+        type: "doughnut",
+        data: { labels, datasets: [{ data: valueData, backgroundColor: colors, borderWidth: 0 }] },
+        options: baseChartOptions({
+          cutout: "62%",
+          plugins: {
+            ...baseChartOptions().plugins,
+            tooltip: {
+              callbacks: {
+                label: context => `${context.label}: ${formatCurrency(context.raw)}`
+              }
+            }
+          }
+        })
+      });
+
+      createOrUpdateChart("amountByKam", "amountByKamChart", {
+        type: "bar",
+        data: {
+          labels,
+          datasets: [{
+            label: "Importo totale",
+            data: valueData,
+            backgroundColor: "rgba(0, 180, 255, 0.55)",
+            borderColor: "rgba(0, 110, 166, 0.90)",
+            borderWidth: 1,
+            borderRadius: 14
+          }]
+        },
+        options: baseChartOptions({
+          scales: {
+            x: { ticks: { color: "#102033", font: { weight: "800" } }, grid: { display: false } },
+            y: { ticks: { color: "#426177", callback: value => formatCurrency(value) }, grid: { color: "rgba(0,120,180,0.10)" } }
+          },
+          plugins: {
+            ...baseChartOptions().plugins,
+            legend: { display: false },
+            tooltip: { callbacks: { label: context => formatCurrency(context.raw) } }
+          }
+        })
+      });
+
+      createOrUpdateChart("globalStatus", "globalStatusChart", {
+        type: "bar",
+        data: {
+          labels: statusLabels,
+          datasets: [{
+            label: "Numero commesse",
+            data: statusData,
+            backgroundColor: statusColors.map(c => `${c}99`),
+            borderColor: statusColors,
+            borderWidth: 1,
+            borderRadius: 14
+          }]
+        },
+        options: baseChartOptions({
+          scales: {
+            x: { ticks: { color: "#102033", font: { weight: "800" } }, grid: { display: false } },
+            y: { beginAtZero: true, ticks: { color: "#426177", precision: 0 }, grid: { color: "rgba(0,120,180,0.10)" } }
+          },
+          plugins: { ...baseChartOptions().plugins, legend: { display: false } }
+        })
+      });
+    }
+
+    function renderLeaderboard() {
+      const podium = document.getElementById("podium");
+      const tbody = document.getElementById("leaderboardTable");
+      podium.innerHTML = "";
+      tbody.innerHTML = "";
+
+      const ranked = [...kamStats].sort((a, b) => b.score - a.score || b.totalAmount - a.totalAmount);
+
+      const podiumItems = ranked.slice(0, 3);
+      if (podiumItems.length === 0) {
+        podium.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><strong>Nessun KAM presente</strong>Aggiungi commesse nella dashboard per generare classifiche.</div>`;
+      } else {
+        podiumItems.forEach((item, index) => {
+          const div = document.createElement("div");
+          div.className = "podium-card";
+          div.innerHTML = `
+            <div class="podium-rank">${index + 1}</div>
+            <div class="podium-name">${escapeHtml(item.kam)}</div>
+            <div class="podium-value">${formatCurrency(item.totalAmount)}</div>
+            <div class="podium-note">${item.totalJobs} lavori · ${formatPercent(item.winRate)} aggiudicati · indice ${item.score}</div>
+          `;
+          podium.appendChild(div);
+        });
+      }
+
+      ranked.forEach((item, index) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><strong>#${index + 1}</strong></td>
+          <td><strong>${escapeHtml(item.kam)}</strong></td>
+          <td>${item.totalJobs}</td>
+          <td>${item.workingJobs}</td>
+          <td>${item.wonJobs}</td>
+          <td>${item.notWonJobs}</td>
+          <td class="money">${formatCurrency(item.totalAmount)}</td>
+          <td class="money">${formatCurrency(item.averageAmount)}</td>
+          <td>
+            <div class="progress-wrap">
+              <div class="progress-line"><div class="progress-fill" style="width:${Math.min(item.jobsShare, 100)}%"></div></div>
+              <div class="progress-label">${formatPercent(item.jobsShare)}</div>
+            </div>
+          </td>
+          <td>
+            <div class="progress-wrap">
+              <div class="progress-line"><div class="progress-fill" style="width:${Math.min(item.valueShare, 100)}%"></div></div>
+              <div class="progress-label">${formatPercent(item.valueShare)}</div>
+            </div>
+          </td>
+          <td>${formatPercent(item.winRate)}</td>
+          <td><strong>${item.score}/100</strong></td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      createOrUpdateChart("competition", "competitionChart", {
+        type: "bar",
+        data: {
+          labels: ranked.slice(0, 8).map(k => k.kam),
+          datasets: [{
+            label: "Indice competizione",
+            data: ranked.slice(0, 8).map(k => k.score),
+            backgroundColor: "rgba(4, 120, 87, 0.55)",
+            borderColor: "rgba(4, 120, 87, 0.95)",
+            borderWidth: 1,
+            borderRadius: 12
+          }]
+        },
+        options: baseChartOptions({
+          indexAxis: "y",
+          scales: {
+            x: { beginAtZero: true, max: 100, ticks: { color: "#426177" }, grid: { color: "rgba(0,120,180,0.10)" } },
+            y: { ticks: { color: "#102033", font: { weight: "800" } }, grid: { display: false } }
+          },
+          plugins: { ...baseChartOptions().plugins, legend: { display: false } }
+        })
+      });
+    }
+
+    function renderKamSelect(previousValue = "") {
+      const selectedExists = previousValue && kamStats.some(item => item.kam === previousValue);
+      const valueToSelect = selectedExists ? previousValue : (kamStats[0]?.kam || "");
+
+      kamSelect.innerHTML = "";
+
+      if (kamStats.length === 0) {
+        kamSelect.innerHTML = `<option value="">Nessun KAM disponibile</option>`;
+        renderSelectedKam(null);
+        return;
+      }
+
+      kamStats
+        .slice()
+        .sort((a, b) => a.kam.localeCompare(b.kam))
+        .forEach(item => {
+          const option = document.createElement("option");
+          option.value = item.kam;
+          option.textContent = item.kam;
+          kamSelect.appendChild(option);
+        });
+
+      kamSelect.value = valueToSelect;
+      renderSelectedKam(valueToSelect);
+    }
+
+    function renderSelectedKam(kamName) {
+      const item = kamStats.find(k => k.kam === kamName) || null;
+      const search = kamSearchInput.value.toLowerCase().trim();
+
+      if (!item) {
+        document.getElementById("selectedKamTitle").innerText = "Dettaglio KAM";
+        document.getElementById("selectedKamSubtitle").innerText = "Seleziona un KAM per visualizzare la sua scheda completa.";
+        document.getElementById("selectedJobsTable").innerHTML = "";
+        document.getElementById("selectedEmptyState").style.display = "block";
+        return;
+      }
+
+      document.getElementById("selectedKamTitle").innerText = `Dettaglio KAM - ${item.kam}`;
+      document.getElementById("selectedKamSubtitle").innerText = `${item.totalJobs} lavori portati, ${formatCurrency(item.totalAmount)} di importo complessivo, ${formatPercent(item.winRate)} di tasso aggiudicazione.`;
+
+      document.getElementById("selectedTotalJobs").innerText = item.totalJobs;
+      document.getElementById("selectedJobsShare").innerText = `${formatPercent(item.jobsShare)} rispetto al totale lavori.`;
+      document.getElementById("selectedWorkingJobs").innerText = item.workingJobs;
+      document.getElementById("selectedWonJobs").innerText = item.wonJobs;
+      document.getElementById("selectedWinRate").innerText = `Tasso aggiudicazione ${formatPercent(item.winRate)}.`;
+      document.getElementById("selectedNotWonJobs").innerText = item.notWonJobs;
+      document.getElementById("selectedTotalAmount").innerText = formatCurrency(item.totalAmount);
+      document.getElementById("selectedValueShare").innerText = `${formatPercent(item.valueShare)} rispetto al valore complessivo.`;
+      document.getElementById("selectedAverageAmount").innerText = formatCurrency(item.averageAmount);
+      document.getElementById("selectedWonAmount").innerText = formatCurrency(item.wonAmount);
+      document.getElementById("selectedScore").innerText = item.score;
+
+      renderSelectedCharts(item);
+      renderSelectedJobsTable(item, search);
+    }
+
+    function renderSelectedCharts(item) {
+      const statusLabels = ["In lavorazione", "In attesa", "Aggiudicati", "Persi", "Rifiutati"];
+      const statusData = [item.workingJobs, item.waitingJobs, item.wonJobs, item.lostJobs, item.refusedJobs];
+      const statusColors = ["#64748b", "#f59e0b", "#047857", "#dc2626", "#7e22ce"];
+
+      createOrUpdateChart("selectedStatus", "selectedStatusChart", {
+        type: "doughnut",
+        data: { labels: statusLabels, datasets: [{ data: statusData, backgroundColor: statusColors, borderWidth: 0 }] },
+        options: baseChartOptions({ cutout: "62%" })
+      });
+
+      createOrUpdateChart("selectedComparison", "selectedComparisonChart", {
+        type: "bar",
+        data: {
+          labels: ["% lavori", "% valore", "tasso aggiud.", "indice"],
+          datasets: [{
+            label: item.kam,
+            data: [item.jobsShare, item.valueShare, item.winRate, item.score],
+            backgroundColor: ["rgba(0, 110, 166, 0.55)", "rgba(0, 191, 255, 0.55)", "rgba(4, 120, 87, 0.55)", "rgba(126, 34, 206, 0.55)"],
+            borderColor: ["#006ea6", "#00bfff", "#047857", "#7e22ce"],
+            borderWidth: 1,
+            borderRadius: 14
+          }]
+        },
+        options: baseChartOptions({
+          scales: {
+            x: { ticks: { color: "#102033", font: { weight: "800" } }, grid: { display: false } },
+            y: { beginAtZero: true, max: 100, ticks: { color: "#426177", callback: value => `${value}%` }, grid: { color: "rgba(0,120,180,0.10)" } }
+          },
+          plugins: { ...baseChartOptions().plugins, legend: { display: false } }
+        })
+      });
+    }
+
+    function renderSelectedJobsTable(item, search) {
+      const tbody = document.getElementById("selectedJobsTable");
+      const emptyState = document.getElementById("selectedEmptyState");
+      tbody.innerHTML = "";
+
+      const lavori = item.lavori.filter(c => {
+        const text = `
+          ${c.numero}
+          ${c.nome}
+          ${c.cognome}
+          ${c.citta}
+          ${c.indirizzo}
+          ${c.oe}
+          ${getStatusLabel(c.stato)}
+          ${c.info}
+          ${c.annotazioni}
+        `.toLowerCase();
+        return text.includes(search);
+      });
+
+      emptyState.style.display = lavori.length === 0 ? "block" : "none";
+
+      lavori.forEach(c => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><strong>${escapeHtml(c.numero || "-")}</strong></td>
+          <td>${escapeHtml(c.nome || "-")}</td>
+          <td>${escapeHtml(c.cognome || "-")}</td>
+          <td>${escapeHtml(c.citta || "-")}</td>
+          <td>${escapeHtml(c.indirizzo || "-")}</td>
+          <td class="money">${formatCurrency(c.oe)}</td>
+          <td>${formatDate(c.dataInvio)}</td>
+          <td>${formatDate(c.dataScadenza)}</td>
+          <td>${formatDate(c.dataAssemblea)}</td>
+          <td><span class="badge badge-${escapeHtml(c.stato || "da-lavorare")}">${getStatusLabel(c.stato)}</span></td>
+          <td>${escapeHtml(c.info || "-")}</td>
+          <td>${escapeHtml(c.annotazioni || "-")}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderAll() {
+      const previousKam = kamSelect.value;
+      kamStats = calculateKamStats();
+      updateGlobalCards();
+      renderOverviewCharts();
+      renderLeaderboard();
+      renderKamSelect(previousKam);
+    }
+
+    function listenCommesse() {
+      if (unsubscribeCommesse) unsubscribeCommesse();
+
+      const q = query(collection(db, "commesse"), orderBy("numero", "asc"));
+
+      unsubscribeCommesse = onSnapshot(q, (snapshot) => {
+        commesse = snapshot.docs.map(item => ({ id: item.id, ...item.data() }));
+        renderAll();
+      }, (error) => {
+        console.error(error);
+        showToast("Errore nel caricamento dati");
+      });
+    }
+
+    async function login() {
+      loginError.style.display = "none";
+      const email = loginEmail.value.trim();
+      const password = loginPassword.value.trim();
+
+      if (!email || !password) {
+        loginError.innerText = "Inserisci email e password.";
+        loginError.style.display = "block";
+        return;
+      }
+
+      loginBtn.disabled = true;
+      loginBtn.innerText = "Accesso...";
+
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        loginPassword.value = "";
+      } catch (error) {
+        console.error(error);
+        loginError.innerText = "Email o password non corrette.";
+        loginError.style.display = "block";
+      } finally {
+        loginBtn.disabled = false;
+        loginBtn.innerText = "Accedi";
+      }
+    }
+
+    async function logout() {
+      try {
+        await signOut(auth);
+      } catch (error) {
+        console.error(error);
+        showToast("Errore durante l'uscita");
+      }
+    }
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        loginScreen.style.display = "none";
+        appContent.style.display = "block";
+        userEmail.innerText = user.email || "Utente collegato";
+        listenCommesse();
+      } else {
+        if (unsubscribeCommesse) {
+          unsubscribeCommesse();
+          unsubscribeCommesse = null;
+        }
+
+        commesse = [];
+        kamStats = [];
+        appContent.style.display = "none";
+        loginScreen.style.display = "flex";
+      }
+    });
+
+    loginBtn.addEventListener("click", login);
+    loginPassword.addEventListener("keydown", event => {
+      if (event.key === "Enter") login();
+    });
+    logoutBtn.addEventListener("click", logout);
+    refreshBtn.addEventListener("click", () => {
+      renderAll();
+      showToast("Statistiche aggiornate");
+    });
+    kamSelect.addEventListener("change", () => renderSelectedKam(kamSelect.value));
+    kamSearchInput.addEventListener("input", () => renderSelectedKam(kamSelect.value));
+  </script>
+</body>
+</html>
